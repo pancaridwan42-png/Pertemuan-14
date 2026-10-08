@@ -27,9 +27,10 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+           'name' => 'required|string|max:255',
+           'email' => 'required|string|email|max:255|unique:users',
+           'role' => 'required|in:admin,editor,user',
+           'password' => 'required|string|min:8|confirmed',
         ], [
             'name.required' => 'Nama lengkap wajib diisi.',
             'email.required' => 'Email wajib diisi.',
@@ -42,6 +43,7 @@ class UserController extends Controller
         User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'role' => $request->role,
             'password' => Hash::make($request->password),
         ]);
 
@@ -56,20 +58,24 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:8|confirmed',
-        ], [
-            'name.required' => 'Nama lengkap wajib diisi.',
-            'email.required' => 'Email wajib diisi.',
-            'email.unique' => 'Email ini sudah digunakan pengguna lain.',
-            'password.min' => 'Kata sandi minimal berisi 8 karakter.',
-            'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
-        ]);
+    'name' => 'required|string|max:255',
+    'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+    'role' => 'required|in:admin,editor,user',
+    'password' => 'nullable|string|min:8|confirmed',
+], [
+    'name.required' => 'Nama lengkap wajib diisi.',
+    'email.required' => 'Email wajib diisi.',
+    'email.unique' => 'Email ini sudah digunakan pengguna lain.',
+    'role.required' => 'Role wajib dipilih.',
+    'role.in' => 'Role yang dipilih tidak valid.',
+    'password.min' => 'Kata sandi minimal berisi 8 karakter.',
+    'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
+]);
 
         $data = [
-            'name' => $request->name,
-            'email' => $request->email,
+             'name' => $request->name,
+             'email' => $request->email,
+             'role' => $request->role,
         ];
 
         // Ganti password hanya jika diinputkan
